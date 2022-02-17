@@ -1,0 +1,128 @@
+[
+    {
+        "id": "1b147d29-fc38-42c6-a63b-e27dcfbc9223",
+        "titoloFilmRichiesto": "SAVE THE LAST DANCE",
+        "formatoFilmRichiesto": "4K",
+        "dataInserimento": "martedì 27 novembre 2018",
+        "nomeCliente": "Veronica",
+        "stato": "PRESA IN CARICO",
+        "note": "MI PIACE DANZARE"
+    },
+    {
+        "id": "38c29be3-cfe2-4308-ac6f-8ecf0a517cce",
+        "titoloFilmRichiesto": "BAMBI",
+        "formatoFilmRichiesto": "HD",
+        "dataInserimento": "giovedì 20 luglio 2017",
+        "nomeCliente": "Livia",
+        "stato": "IN LAVORAZIONE",
+        "note": null
+    },
+    {
+        "id": "78f20f69-d6b8-4c4d-a41d-be41b7fc454e",
+        "titoloFilmRichiesto": "GLI ARISTOGATTI",
+        "formatoFilmRichiesto": "FULL-HD",
+        "dataInserimento": "venerdì 17 agosto 2018",
+        "nomeCliente": "Livia",
+        "stato": "COMPLETATA",
+        "note": "I GAAAATTI??"
+    },
+    {
+        "id": "802db445-78df-4d6a-9efe-1af55ea2b151",
+        "titoloFilmRichiesto": "ALLA RICERCA DELLA VALLE INCANTATA 3",
+        "formatoFilmRichiesto": "HD",
+        "dataInserimento": "giovedì 13 settembre 2018",
+        "nomeCliente": "Livia",
+        "stato": "PRESA IN CARICO",
+        "note": "ciao"
+    },
+    {
+        "id": "829cc17f-b4ac-49d3-a766-4dee44f3954d",
+        "titoloFilmRichiesto": "CANTO DI NATALE",
+        "formatoFilmRichiesto": "HD",
+        "dataInserimento": "sabato 28 aprile 2018",
+        "nomeCliente": "Serena",
+        "stato": "IN LAVORAZIONE",
+        "note": null
+    },
+    {
+        "id": "834d44ec-d661-4a4f-b273-642ef51fe7c8",
+        "titoloFilmRichiesto": "4 BASSOTTI PER UN DANESE",
+        "formatoFilmRichiesto": "FULL-HD",
+        "dataInserimento": "giovedì 20 dicembre 2017",
+        "nomeCliente": "Livia",
+        "stato": "PRESA IN CARICO",
+        "note": null
+    },
+    {
+        "id": "8d7d6fb2-6c8e-43fb-bff6-ecfea9691738",
+        "titoloFilmRichiesto": "ALLA RICERCA DELLA VALLE INCANTATA 2",
+        "formatoFilmRichiesto": "DVD",
+        "dataInserimento": "venerdì 7 settembre 2018",
+        "nomeCliente": "Livia",
+        "stato": "RIFIUTATA",
+        "note": null
+    },
+    {
+        "id": "9735d46a-9355-48d4-b1bf-59e06e928d5f",
+        "titoloFilmRichiesto": "Test 1",
+        "formatoFilmRichiesto": "HD",
+        "dataInserimento": "venerdì 1 febbraio 2019",
+        "nomeCliente": "Veronica",
+        "stato": "IN LAVORAZIONE",
+        "note": "film"
+    },
+    {
+        "id": "a2c2e92a-7c8c-4dc3-a9f1-bbbc15822e12",
+        "titoloFilmRichiesto": "PINCO E PANCO ALLEGRI MASNADIERI",
+        "formatoFilmRichiesto": "DVD",
+        "dataInserimento": "sabato 1 dicembre 2018",
+        "nomeCliente": "Mattia",
+        "stato": "PRESA IN CARICO",
+        "note": "AHAHAHAHAH!!!"
+    },
+    {
+        "id": "bb15024c-1ccb-45da-8c23-8d78f2013f67",
+        "titoloFilmRichiesto": "POKEMON",
+        "formatoFilmRichiesto": "HD",
+        "dataInserimento": "sabato 14 ottobre 2017",
+        "nomeCliente": "Mattia",
+        "stato": "IN LAVORAZIONE",
+        "note": "MI PIACCIONO TANTO I POKEMON"
+    },
+    {
+        "id": "f30ef46a-4a8c-4951-8d00-9428635d2555",
+        "titoloFilmRichiesto": "OPERAZIONE GATTO",
+        "formatoFilmRichiesto": "FULL-HD",
+        "dataInserimento": "giovedì 12 aprile 2018",
+        "nomeCliente": "Livia",
+        "stato": "COMPLETATA",
+        "note": ""
+    },
+    {
+        "id": "8277b096-07da-4104-80b0-928cb9b57f2d",
+        "titoloFilmRichiesto": "I LOVE SHOPPING",
+        "formatoFilmRichiesto": "DVD",
+        "dataInserimento": "lunedì 9 ottobre 2017",
+        "nomeCliente": "Livia",
+        "stato": "RIFIUTATA",
+        "note": "- Film già Presente nel Catalogo"
+    },
+    {
+        "id": "8f5ad37a-f0c2-43b2-9f8e-d48be0197c34",
+        "titoloFilmRichiesto": "FAHRENHEIT 451",
+        "formatoFilmRichiesto": "HD",
+        "dataInserimento": "mercoledì 11 aprile 2018",
+        "nomeCliente": "Silvio",
+        "stato": "COMPLETATA",
+        "note": null
+    },
+    {
+        "id": "ca355e34-fc5e-438c-a869-9155e72cbca6",
+        "titoloFilmRichiesto": "DOTTOR STRANAMORE",
+        "formatoFilmRichiesto": "HD",
+        "dataInserimento": "giovedì 16 settembre 2021",
+        "nomeCliente": "Serena",
+        "stato": "PRESA IN CARICO",
+        "note": null
+    }
+]
