@@ -1,6 +1,7 @@
 package it.enzo.me.FilmStore.backend.Customer.service;
 
 import it.enzo.me.FilmStore.backend.Customer.model.Customer;
+import it.enzo.me.FilmStore.backend.Customer.model.Login;
 import it.enzo.me.FilmStore.backend.Exception.NotFoundException;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
@@ -137,13 +138,14 @@ public class CustomerServiceImpl implements CustomerService {
     }
 
     @Override
-    public Boolean loginCustomer(Customer loggingCustomer, String psw) {
-        boolean login = false;
-        Query query = new Query(Criteria.where("_id").is(loggingCustomer.getId()));
+    public Customer loginCustomer(Login loggingCustomer) {
+        Query query = new Query(Criteria.where("firstName").is(loggingCustomer.getUsername()));
         Customer c = mongoTemplate.findOne(query, Customer.class);
-        if (c.getPassword().equals(psw)) {
-            login = true;
+        if (c == null)
+            return null;
+        if (c.getPassword().equals(loggingCustomer.getPassword())) {
+            return c;
         }
-        return login;
+        return null;
     }
 }

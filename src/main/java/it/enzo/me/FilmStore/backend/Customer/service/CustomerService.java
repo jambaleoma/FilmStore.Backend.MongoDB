@@ -1,6 +1,7 @@
 package it.enzo.me.FilmStore.backend.Customer.service;
 
 import it.enzo.me.FilmStore.backend.Customer.model.Customer;
+import it.enzo.me.FilmStore.backend.Customer.model.Login;
 
 import java.util.List;
 
@@ -13,6 +14,6 @@ public interface CustomerService {
     Customer updateCustomer(Customer nuovoCustomer, String id);
     Boolean changeCustomerPsw(Customer nuovoCustomer, String id);
     Customer deleteCustomerById(String id);
-    Boolean loginCustomer(Customer loggingCustomer, String psw);
+    Customer loginCustomer(Login loggingCustomer);
 
 }

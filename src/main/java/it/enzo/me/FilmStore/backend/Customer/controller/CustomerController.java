@@ -1,6 +1,7 @@
 package it.enzo.me.FilmStore.backend.Customer.controller;
 
 import it.enzo.me.FilmStore.backend.Customer.model.Customer;
+import it.enzo.me.FilmStore.backend.Customer.model.Login;
 import it.enzo.me.FilmStore.backend.Customer.service.CustomerService;
 import org.apache.tomcat.util.codec.binary.Base64;
 import org.apache.tomcat.util.codec.binary.StringUtils;
@@ -98,10 +99,10 @@ public class CustomerController {
     }
 
     @CrossOrigin
-    @PostMapping(value = "/loginCustomer/{psw}")
-    private ResponseEntity loginCustomer(@RequestBody Customer loggingCustomer, @PathVariable String psw) {
+    @PostMapping(value = "/loginCustomer")
+    private ResponseEntity loginCustomer(@RequestBody Login loggingCustomer) {
         try {
-            Boolean login = customerService.loginCustomer(loggingCustomer, psw);
+            Customer login = customerService.loginCustomer(loggingCustomer);
             return ResponseEntity.status(HttpStatus.OK).header("Customer Loggato con Successo", "--- OK --- Il Customers è stato Loggato con Successo").body(login);
         } catch (Exception e) {
             throw e;

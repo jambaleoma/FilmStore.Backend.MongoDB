@@ -1,10 +1,12 @@
 package it.enzo.me.FilmStore.backend.Film.controller;
 
 import it.enzo.me.FilmStore.backend.Film.model.Film;
+import it.enzo.me.FilmStore.backend.Film.model.FilmPage;
 import it.enzo.me.FilmStore.backend.Film.service.FilmService;
 import org.apache.tomcat.util.codec.binary.Base64;
 import org.apache.tomcat.util.codec.binary.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -25,6 +27,17 @@ public class FilmController {
     private ResponseEntity getAllFilms() {
         try {
             List<Film> films = this.filmsService.getAllFilms();
+            return ResponseEntity.status(HttpStatus.OK).header("Lista Film", "--- OK --- Lista Film Trovata Con Successo").body(films);
+        } catch (Exception e) {
+            throw e;
+        }
+    }
+
+    @CrossOrigin
+    @GetMapping(value = "/pageAll")
+    private ResponseEntity<Page<Film>> getAllPagebleFilms(FilmPage filmPage) {
+        try {
+            Page<Film> films = this.filmsService.getAllPagebleFilms(filmPage);
             return ResponseEntity.status(HttpStatus.OK).header("Lista Film", "--- OK --- Lista Film Trovata Con Successo").body(films);
         } catch (Exception e) {
             throw e;

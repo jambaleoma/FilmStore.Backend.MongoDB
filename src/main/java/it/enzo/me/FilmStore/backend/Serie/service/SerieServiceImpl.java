@@ -1,27 +1,18 @@
 package it.enzo.me.FilmStore.backend.Serie.service;
 
 import it.enzo.me.FilmStore.backend.Customer.service.CustomerServiceImpl;
-import it.enzo.me.FilmStore.backend.Exception.AlreadyExistException;
 import it.enzo.me.FilmStore.backend.Exception.NotFoundException;
 import it.enzo.me.FilmStore.backend.Serie.model.Serie;
 import it.enzo.me.FilmStore.backend.Stagione.model.Stagione;
-import net.minidev.json.JSONArray;
-import net.minidev.json.JSONObject;
-import net.minidev.json.parser.JSONParser;
-import net.minidev.json.parser.ParseException;
 import it.enzo.me.FilmStore.backend.Stagione.service.StagioneService;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Controller;
 
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Collections;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -56,9 +47,10 @@ public class SerieServiceImpl implements SerieService {
 
     @Override
     public List<Serie> getAllNewSerie(Integer numeroNuoveSerie) {
-        List<Serie> allNewSerie = this.getAllSerie();
-        Collections.sort(allNewSerie, new DataCreazioneComparatore());
-        allNewSerie = allNewSerie.subList(0, numeroNuoveSerie);
+        List<Serie> allNewSerie;
+        Query q = new Query();
+        q.addCriteria(Criteria.where("_class").is("it.enzo.me.FilmStore.backend.Serie.model.Serie")).with(Sort.by(Sort.Direction.DESC, "dataCreazione")).limit(numeroNuoveSerie);
+        allNewSerie = mongoTemplate.find(q,Serie.class);
         StringBuilder listNewSerie = new StringBuilder();
         listNewSerie.append("\nRichiesta elenco " + numeroNuoveSerie + " Serie più recenti:\n");
         listNewSerie.append("\nTrovate " + allNewSerie.size() + " Serie\n");

@@ -1,29 +1,26 @@
 package it.enzo.me.FilmStore.backend.Film.service;
 
-import it.enzo.me.FilmStore.backend.Customer.model.Customer;
 import it.enzo.me.FilmStore.backend.Customer.service.CustomerServiceImpl;
 import it.enzo.me.FilmStore.backend.Exception.NotFoundException;
 import it.enzo.me.FilmStore.backend.Film.model.Film;
+import it.enzo.me.FilmStore.backend.Film.model.FilmPage;
 import it.enzo.me.FilmStore.backend.Film.repository.FilmRepository;
-import net.minidev.json.JSONArray;
-import net.minidev.json.JSONObject;
-import net.minidev.json.parser.JSONParser;
-import net.minidev.json.parser.ParseException;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Controller;
 
-import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Collections;
 import java.util.List;
 import java.util.logging.Logger;
+import java.util.regex.Pattern;
 
 @Controller
 public class FilmServiceImpl implements FilmService {
@@ -33,13 +30,19 @@ public class FilmServiceImpl implements FilmService {
     final
     MongoTemplate mongoTemplate;
 
-    public FilmServiceImpl(MongoTemplate mongoTemplate) {
+    private final
+    FilmRepository filmRepository;
+
+    public FilmServiceImpl(MongoTemplate mongoTemplate, FilmRepository filmRepository) {
         this.mongoTemplate = mongoTemplate;
+        this.filmRepository = filmRepository;
     }
 
     @Override
     public List<Film> getAllFilms() {
-        List<Film> films = (List<Film>) mongoTemplate.findAll(Film.class);
+        Query q = new Query();
+        q.addCriteria(Criteria.where("_class").is("it.enzo.me.FilmStore.backend.Film.model.Film")).with(Sort.by(Sort.Direction.DESC, "dataCreazione")).limit(10);
+        List<Film> films = (List<Film>) mongoTemplate.find(q, Film.class);
         if (films == null) {
             throw new NotFoundException("Nessun Film Trovato");
         }
@@ -48,6 +51,14 @@ public class FilmServiceImpl implements FilmService {
         listFilms.append("\nTrovati " + films.size() + " Film\n");
         LOGGER.info(listFilms.toString());
         return films;
+    }
+
+    @Override
+    public Page<Film> getAllPagebleFilms(FilmPage filmPage) {
+        Sort sort = Sort.by(filmPage.getSortDirection(), filmPage.getSortBy());
+        Pageable pageable = PageRequest.of(filmPage.getPageNumber(),
+                filmPage.getPageSize(), sort);
+        return filmRepository.findAll(pageable);
     }
 
     @Override
@@ -70,12 +81,12 @@ public class FilmServiceImpl implements FilmService {
         LOGGER.info(recentOlderYearFilm.toString());
         return recentOlderYear;
     }
-
     @Override
     public List<Film> getAllNewFilms(Integer numeroNuoviFilm) {
-        List<Film> allNewFilms = this.getAllFilms();
-        Collections.sort(allNewFilms, new DataCreazioneComparatore());
-        allNewFilms = allNewFilms.subList(0, numeroNuoviFilm);
+        List<Film> allNewFilms;
+        Query q = new Query();
+        q.addCriteria(Criteria.where("_class").is("it.enzo.me.FilmStore.backend.Film.model.Film")).with(Sort.by(Sort.Direction.DESC, "dataCreazione")).limit(numeroNuoviFilm);
+        allNewFilms = mongoTemplate.find(q,Film.class);
         StringBuilder listNewFilms = new StringBuilder();
         listNewFilms.append("\nRichiesta elenco " + numeroNuoviFilm + " Film più recenti:\n");
         listNewFilms.append("\nTrovati " + allNewFilms.size() + " Film\n");
@@ -89,23 +100,23 @@ public class FilmServiceImpl implements FilmService {
 
     @Override
     public List<Film> getAllFilmsByName(String nome) {
-        List<Film> films = new ArrayList<>();
-        for (Film f : mongoTemplate.findAll(Film.class)) {
-            if (f.getNome().matches("(.*)" + nome + "(.*)"))
-                films.add(f);
-        }
-        if (films.size() == 0) {
+        List<Film> allFilmsByName;
+        Query q = new Query();
+        Pattern pattern = Pattern.compile(Pattern.quote(nome), Pattern.CASE_INSENSITIVE);
+        q.addCriteria(Criteria.where("nome").regex(pattern)).with(Sort.by(Sort.Direction.DESC, "id"));
+        allFilmsByName = mongoTemplate.find(q,Film.class);
+        if (allFilmsByName.size() == 0) {
             throw new NotFoundException("Nessun Film con Nome: " + nome + " è stato Trovato");
         }
         StringBuilder listFilmsByName = new StringBuilder();
         listFilmsByName.append("\nRichiesta elenco Film filtrati per Nome '" + nome + "':\n");
-        listFilmsByName.append("\nTrovati " + films.size() + " Film\n");
+        listFilmsByName.append("\nTrovati " + allFilmsByName.size() + " Film\n");
         listFilmsByName.append("\nElenco Film filtrati per Nome '" + nome + "':\n\n");
-        for (Film f : films) {
+        for (Film f : allFilmsByName) {
             listFilmsByName.append("Nome: " + f.getNome() + " Anno: " + f.getAnno() + " Data Creazione: " + f.getDataCreazione() + "\n");
         }
         LOGGER.info(listFilmsByName.toString());
-        return films;
+        return allFilmsByName;
     }
 
     @Override
