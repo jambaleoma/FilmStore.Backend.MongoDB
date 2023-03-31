@@ -4,7 +4,9 @@ import it.enzo.me.FilmStore.backend.Customer.service.CustomerServiceImpl;
 import it.enzo.me.FilmStore.backend.Exception.NotFoundException;
 import it.enzo.me.FilmStore.backend.Film.model.Film;
 import it.enzo.me.FilmStore.backend.Film.model.FilmPage;
+import it.enzo.me.FilmStore.backend.Film.model.FilterFilm;
 import it.enzo.me.FilmStore.backend.Film.repository.FilmRepository;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -13,6 +15,7 @@ import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
+import org.springframework.data.support.PageableExecutionUtils;
 import org.springframework.stereotype.Controller;
 
 import java.text.SimpleDateFormat;
@@ -64,17 +67,9 @@ public class FilmServiceImpl implements FilmService {
     @Override
     public String getRecentOlderYear() {
         String recentOlderYear = "";
-        int recentYear = 0;
-        int olderYear = Calendar.getInstance().get(Calendar.YEAR);
-        for (Film f : mongoTemplate.findAll(Film.class)) {
-            if (f.getAnno() < olderYear) {
-                olderYear = f.getAnno();
-            }
-            if (f.getAnno() > recentYear) {
-                recentYear = f.getAnno();
-            }
-            recentOlderYear = olderYear + "-" + recentYear;
-        }
+        int recentYear = this.max();
+        int olderYear = this.min();
+        recentOlderYear = olderYear + "-" + recentYear;
         StringBuilder recentOlderYearFilm = new StringBuilder();
         recentOlderYearFilm.append("\nRichiesta anno film meno recente e più recente:\n");
         recentOlderYearFilm.append("\nAnno meno recente: " + olderYear + " Anno più recente: " + recentYear +"\n");
@@ -99,49 +94,103 @@ public class FilmServiceImpl implements FilmService {
     }
 
     @Override
-    public List<Film> getAllFilmsByName(String nome) {
-        List<Film> allFilmsByName;
+    public Page<Film> getAllFilmsByName(String nome, FilmPage filmPage) {
+
         Query q = new Query();
         Pattern pattern = Pattern.compile(Pattern.quote(nome), Pattern.CASE_INSENSITIVE);
-        q.addCriteria(Criteria.where("nome").regex(pattern)).with(Sort.by(Sort.Direction.DESC, "id"));
-        allFilmsByName = mongoTemplate.find(q,Film.class);
-        if (allFilmsByName.size() == 0) {
-            throw new NotFoundException("Nessun Film con Nome: " + nome + " è stato Trovato");
-        }
+        Sort sort = Sort.by(filmPage.getSortDirection(), filmPage.getSortBy());
+        Pageable pageable = PageRequest.of(filmPage.getPageNumber(), filmPage.getPageSize(), sort);
+        q.addCriteria(Criteria.where("nome").regex(pattern)).with(pageable);
+
         StringBuilder listFilmsByName = new StringBuilder();
         listFilmsByName.append("\nRichiesta elenco Film filtrati per Nome '" + nome + "':\n");
-        listFilmsByName.append("\nTrovati " + allFilmsByName.size() + " Film\n");
-        listFilmsByName.append("\nElenco Film filtrati per Nome '" + nome + "':\n\n");
-        for (Film f : allFilmsByName) {
-            listFilmsByName.append("Nome: " + f.getNome() + " Anno: " + f.getAnno() + " Data Creazione: " + f.getDataCreazione() + "\n");
-        }
         LOGGER.info(listFilmsByName.toString());
-        return allFilmsByName;
+
+        return PageableExecutionUtils.getPage(
+                mongoTemplate.find(q, Film.class),
+                pageable,
+                () -> mongoTemplate.count(q.skip(0).limit(0), Film.class)
+        );
     }
 
     @Override
-    public List<Film> getAllFilmsByCategory(String categoria) {
-        List<Film> films = new ArrayList<>();
-        for (Film f : mongoTemplate.findAll(Film.class)) {
-            for(int i = 0; i < f.getCategoria().size(); i++) {
-                if (i > 3)
-                    break;
-                if (f.getCategoria().get(i).equals(categoria))
-                    films.add(f);
-            }
+    public Page<Film> getAllFilmsByFormat(String fomrat, FilmPage filmPage) {
+
+        Query q = new Query();
+        Pattern pattern = Pattern.compile(Pattern.quote(fomrat), Pattern.CASE_INSENSITIVE);
+        Sort sort = Sort.by(filmPage.getSortDirection(), filmPage.getSortBy());
+        Pageable pageable = PageRequest.of(filmPage.getPageNumber(), filmPage.getPageSize(), sort);
+        q.addCriteria(Criteria.where("formato").regex(pattern)).with(pageable);
+
+        StringBuilder listFilmsByName = new StringBuilder();
+        listFilmsByName.append("\nRichiesta elenco Film filtrati per Formato '" + fomrat + "':\n");
+        LOGGER.info(listFilmsByName.toString());
+
+        return PageableExecutionUtils.getPage(
+                mongoTemplate.find(q, Film.class),
+                pageable,
+                () -> mongoTemplate.count(q.skip(0).limit(0), Film.class)
+        );
+    }
+
+    @Override
+    public Page<Film> getAllFilmsByCategory(List<String> categories, FilmPage filmPage) {
+
+        Query q = new Query();
+        Sort sort = Sort.by(filmPage.getSortDirection(), filmPage.getSortBy());
+        Pageable pageable = PageRequest.of(filmPage.getPageNumber(), filmPage.getPageSize(), sort);
+        List<String> categoryList = new ArrayList<>(categories);
+        q.addCriteria(Criteria.where("categoria").all(categoryList)).with(pageable);
+
+        StringBuilder listFilmsByName = new StringBuilder();
+        listFilmsByName.append("\nRichiesta elenco Film filtrati per Categoria: \n");
+        LOGGER.info(listFilmsByName.toString());
+
+        return PageableExecutionUtils.getPage(
+                mongoTemplate.find(q, Film.class),
+                pageable,
+                () -> mongoTemplate.count(q.skip(0).limit(0), Film.class)
+        );
+    }
+
+    @Override
+    public Page<Film> getAllFilteredFilms(FilterFilm filterFilm, FilmPage filmPage) {
+
+        Query q = new Query();
+        Sort sort = Sort.by(filmPage.getSortDirection(), filmPage.getSortBy());
+        Pageable pageable = PageRequest.of(filmPage.getPageNumber(), filmPage.getPageSize(), sort);
+        if (filterFilm.getCategorieFilm().size() > 0) {
+            List<String> categoryList = new ArrayList<>(filterFilm.getCategorieFilm());
+            q.addCriteria(Criteria.where("categoria").all(categoryList)).with(pageable);
         }
-        if (films.size() == 0) {
-            throw new NotFoundException("Nessun Film con categoria: " + categoria + " è stato Trovato");
+        if (StringUtils.isNotBlank(filterFilm.getNomeFilm())) {
+            Pattern patternNome = Pattern.compile(Pattern.quote(filterFilm.getNomeFilm()), Pattern.CASE_INSENSITIVE);
+            q.addCriteria(Criteria.where("nome").regex(patternNome)).with(pageable);
         }
-        StringBuilder listFilmsByCategory = new StringBuilder();
-        listFilmsByCategory.append("\nRichiesta elenco Film filtrati Per Categoria '" + categoria + "':\n");
-        listFilmsByCategory.append("\nTrovati " + films.size() + " Film\n");
-        listFilmsByCategory.append("\nElenco Film filtrati Per Categoria '" + categoria + "':\n\n");
-        for (Film f : films) {
-            listFilmsByCategory.append("Nome: " + f.getNome() + " Anno: " + f.getAnno() + " Data Creazione: " + f.getDataCreazione() + "\n");
+        if (StringUtils.isNotBlank(filterFilm.getFormatoFilm())) {
+            Pattern patternFormato = Pattern.compile(Pattern.quote(filterFilm.getFormatoFilm()), Pattern.CASE_INSENSITIVE);
+            q.addCriteria(Criteria.where("formato").regex(patternFormato)).with(pageable);
         }
-        LOGGER.info(listFilmsByCategory.toString());
-        return films;
+
+        StringBuilder listFilmsByName = new StringBuilder();
+        listFilmsByName.append("\nRichiesta elenco Film filtrati per Categoria: \n");
+        LOGGER.info(listFilmsByName.toString());
+
+        return PageableExecutionUtils.getPage(
+                mongoTemplate.find(q, Film.class),
+                pageable,
+                () -> mongoTemplate.count(q.skip(0).limit(0), Film.class)
+        );
+    }
+
+    @Override
+    public Integer min() {
+        return filmRepository.min();
+    }
+
+    @Override
+    public Integer max() {
+        return filmRepository.max();
     }
 
     @Override

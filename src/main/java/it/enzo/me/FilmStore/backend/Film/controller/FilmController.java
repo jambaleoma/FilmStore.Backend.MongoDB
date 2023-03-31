@@ -2,6 +2,7 @@ package it.enzo.me.FilmStore.backend.Film.controller;
 
 import it.enzo.me.FilmStore.backend.Film.model.Film;
 import it.enzo.me.FilmStore.backend.Film.model.FilmPage;
+import it.enzo.me.FilmStore.backend.Film.model.FilterFilm;
 import it.enzo.me.FilmStore.backend.Film.service.FilmService;
 import org.apache.tomcat.util.codec.binary.Base64;
 import org.apache.tomcat.util.codec.binary.StringUtils;
@@ -68,9 +69,9 @@ public class FilmController {
 
     @CrossOrigin
     @GetMapping(value = "/byName/{nome}")
-    private ResponseEntity getAllFilmsByName(@PathVariable String nome) {
+    private ResponseEntity getAllFilmsByName(@PathVariable String nome, FilmPage filmPage) {
         try {
-            List<Film> films = this.filmsService.getAllFilmsByName(nome);
+            Page<Film> films = this.filmsService.getAllFilmsByName(nome, filmPage);
             return ResponseEntity.status(HttpStatus.OK).header("Lista Films per Nome", "--- OK --- Lista Films per Nome Trovata Con Successo").body(films);
         } catch (Exception e) {
             throw e;
@@ -78,11 +79,33 @@ public class FilmController {
     }
 
     @CrossOrigin
-    @GetMapping(value = "/byCategory/{category}")
-    private ResponseEntity getFilmsByCategory(@PathVariable String category) {
+    @GetMapping(value = "/byFormat/{format}")
+    private ResponseEntity getAllFilmsByFormat(@PathVariable String format, FilmPage filmPage) {
         try {
-            List<Film> films = this.filmsService.getAllFilmsByCategory(category);
-            return ResponseEntity.status(HttpStatus.OK).header("Lista Films per Categoria", "--- OK --- Lista Films per Categoria Trovata Con Successo", "Numero Film Trovati: " + films.size()).body(films);
+            Page<Film> films = this.filmsService.getAllFilmsByFormat(format, filmPage);
+            return ResponseEntity.status(HttpStatus.OK).header("Lista Films per Nome", "--- OK --- Lista Films per Nome Trovata Con Successo").body(films);
+        } catch (Exception e) {
+            throw e;
+        }
+    }
+
+    @CrossOrigin
+    @GetMapping(value = "/byCategory")
+    private ResponseEntity getFilmsByCategory(@RequestBody List<String> categories, FilmPage filmPage) {
+        try {
+            Page<Film> films = this.filmsService.getAllFilmsByCategory(categories, filmPage);
+            return ResponseEntity.status(HttpStatus.OK).header("Lista Films per Categoria", "--- OK --- Lista Films per Categoria Trovata Con Successo").body(films);
+        } catch (Exception e) {
+            throw e;
+        }
+    }
+
+    @CrossOrigin
+    @GetMapping(value = "/allFilteredFilms")
+    private ResponseEntity getAllFilteredFilms(@RequestBody FilterFilm filterFilm, FilmPage filmPage) {
+        try {
+            Page<Film> films = this.filmsService.getAllFilteredFilms(filterFilm, filmPage);
+            return ResponseEntity.status(HttpStatus.OK).header("Lista Films per Categoria", "--- OK --- Lista Films per Categoria Trovata Con Successo").body(films);
         } catch (Exception e) {
             throw e;
         }

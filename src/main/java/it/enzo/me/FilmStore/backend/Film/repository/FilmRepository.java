@@ -1,14 +1,22 @@
 package it.enzo.me.FilmStore.backend.Film.repository;
 
 import it.enzo.me.FilmStore.backend.Film.model.Film;
-import org.springframework.data.mongodb.repository.MongoRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.mongodb.repository.Aggregation;
 import org.springframework.data.mongodb.repository.Query;
+import org.springframework.data.repository.PagingAndSortingRepository;
 
 import java.util.List;
 
 
-public interface FilmRepository extends MongoRepository<Film, String> {
+public interface FilmRepository extends PagingAndSortingRepository<Film, String> {
+    @Query(value="{'nome': ?0}")
+    Page<Film> findByMethod(String nome, Pageable pageable);
 
-    @Query("SELECT COUNT(*) AS count FROM #{#n1ql.bucket} WHERE #{#n1ql.filter} and formato = $1")
-    List<Film> getFilmByFormatoQuery(String formato);
+    @Aggregation(pipeline = { "{$group: { _id: '', filtroAnno: {$max:  $anno }}}" })
+    public Integer max();
+
+    @Aggregation(pipeline = { "{$group: {_id:  '', filtroAnno: {$min:  $anno }}}" })
+    public Integer min();
 }
