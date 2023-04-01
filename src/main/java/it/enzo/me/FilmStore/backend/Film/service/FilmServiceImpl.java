@@ -114,16 +114,16 @@ public class FilmServiceImpl implements FilmService {
     }
 
     @Override
-    public Page<Film> getAllFilmsByFormat(String fomrat, FilmPage filmPage) {
+    public Page<Film> getAllFilmsByFormat(String format, FilmPage filmPage) {
 
         Query q = new Query();
-        Pattern pattern = Pattern.compile(Pattern.quote(fomrat), Pattern.CASE_INSENSITIVE);
+        Pattern pattern = Pattern.compile(Pattern.quote(format), Pattern.CASE_INSENSITIVE);
         Sort sort = Sort.by(filmPage.getSortDirection(), filmPage.getSortBy());
         Pageable pageable = PageRequest.of(filmPage.getPageNumber(), filmPage.getPageSize(), sort);
         q.addCriteria(Criteria.where("formato").regex(pattern)).with(pageable);
 
         StringBuilder listFilmsByName = new StringBuilder();
-        listFilmsByName.append("\nRichiesta elenco Film filtrati per Formato '" + fomrat + "':\n");
+        listFilmsByName.append("\nRichiesta elenco Film filtrati per Formato '" + format);
         LOGGER.info(listFilmsByName.toString());
 
         return PageableExecutionUtils.getPage(
@@ -140,10 +140,10 @@ public class FilmServiceImpl implements FilmService {
         Sort sort = Sort.by(filmPage.getSortDirection(), filmPage.getSortBy());
         Pageable pageable = PageRequest.of(filmPage.getPageNumber(), filmPage.getPageSize(), sort);
         List<String> categoryList = new ArrayList<>(categories);
-        q.addCriteria(Criteria.where("categoria").all(categoryList)).with(pageable);
+        q.addCriteria(Criteria.where("categoria").in(categoryList)).with(pageable);
 
         StringBuilder listFilmsByName = new StringBuilder();
-        listFilmsByName.append("\nRichiesta elenco Film filtrati per Categoria: \n");
+        listFilmsByName.append("\nRichiesta elenco Film filtrati per Categoria: " + categories);
         LOGGER.info(listFilmsByName.toString());
 
         return PageableExecutionUtils.getPage(
@@ -159,10 +159,6 @@ public class FilmServiceImpl implements FilmService {
         Query q = new Query();
         Sort sort = Sort.by(filmPage.getSortDirection(), filmPage.getSortBy());
         Pageable pageable = PageRequest.of(filmPage.getPageNumber(), filmPage.getPageSize(), sort);
-        if (filterFilm.getCategorieFilm().size() > 0) {
-            List<String> categoryList = new ArrayList<>(filterFilm.getCategorieFilm());
-            q.addCriteria(Criteria.where("categoria").all(categoryList)).with(pageable);
-        }
         if (StringUtils.isNotBlank(filterFilm.getNomeFilm())) {
             Pattern patternNome = Pattern.compile(Pattern.quote(filterFilm.getNomeFilm()), Pattern.CASE_INSENSITIVE);
             q.addCriteria(Criteria.where("nome").regex(patternNome)).with(pageable);
@@ -170,6 +166,10 @@ public class FilmServiceImpl implements FilmService {
         if (StringUtils.isNotBlank(filterFilm.getFormatoFilm())) {
             Pattern patternFormato = Pattern.compile(Pattern.quote(filterFilm.getFormatoFilm()), Pattern.CASE_INSENSITIVE);
             q.addCriteria(Criteria.where("formato").regex(patternFormato)).with(pageable);
+        }
+        if (filterFilm.getCategorieFilm().size() > 0) {
+            List<String> categoryList = new ArrayList<>(filterFilm.getCategorieFilm());
+            q.addCriteria(Criteria.where("categoria").in(categoryList)).with(pageable);
         }
 
         StringBuilder listFilmsByName = new StringBuilder();

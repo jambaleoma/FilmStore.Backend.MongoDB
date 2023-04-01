@@ -14,7 +14,7 @@ public interface FilmService {
         String getRecentOlderYear();
         List<Film> getAllNewFilms (Integer numeroNuoviFilm);
         Page<Film> getAllFilmsByName(String nome, FilmPage filmPage);
-        Page<Film> getAllFilmsByFormat(String nome, FilmPage filmPage);
+        Page<Film> getAllFilmsByFormat(String format, FilmPage filmPage);
         Page<Film> getAllFilmsByCategory(List<String> categories, FilmPage filmPage);
         Page<Film> getAllFilteredFilms(FilterFilm filterFilm, FilmPage filmPage);
         Integer min();

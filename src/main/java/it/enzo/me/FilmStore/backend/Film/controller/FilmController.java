@@ -90,7 +90,7 @@ public class FilmController {
     }
 
     @CrossOrigin
-    @GetMapping(value = "/byCategory")
+    @PostMapping(value = "/byCategory")
     private ResponseEntity getFilmsByCategory(@RequestBody List<String> categories, FilmPage filmPage) {
         try {
             Page<Film> films = this.filmsService.getAllFilmsByCategory(categories, filmPage);
@@ -101,7 +101,7 @@ public class FilmController {
     }
 
     @CrossOrigin
-    @GetMapping(value = "/allFilteredFilms")
+    @PostMapping(value = "/allFilteredFilms")
     private ResponseEntity getAllFilteredFilms(@RequestBody FilterFilm filterFilm, FilmPage filmPage) {
         try {
             Page<Film> films = this.filmsService.getAllFilteredFilms(filterFilm, filmPage);
