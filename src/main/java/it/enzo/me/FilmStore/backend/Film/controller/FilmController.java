@@ -101,6 +101,17 @@ public class FilmController {
     }
 
     @CrossOrigin
+    @GetMapping(value = "/byYear/{year}")
+    private ResponseEntity getFilmsByYear(@PathVariable Integer year, FilmPage filmPage) {
+        try {
+            Page<Film> films = this.filmsService.getAllFilmsByYear(year, filmPage);
+            return ResponseEntity.status(HttpStatus.OK).header("Lista Films per Categoria", "--- OK --- Lista Films per Categoria Trovata Con Successo").body(films);
+        } catch (Exception e) {
+            throw e;
+        }
+    }
+
+    @CrossOrigin
     @PostMapping(value = "/allFilteredFilms")
     private ResponseEntity getAllFilteredFilms(@RequestBody FilterFilm filterFilm, FilmPage filmPage) {
         try {

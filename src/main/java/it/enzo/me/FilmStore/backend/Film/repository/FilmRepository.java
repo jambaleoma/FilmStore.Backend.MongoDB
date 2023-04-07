@@ -9,11 +9,7 @@ import org.springframework.data.repository.PagingAndSortingRepository;
 
 import java.util.List;
 
-
 public interface FilmRepository extends PagingAndSortingRepository<Film, String> {
-    @Query(value="{'nome': ?0}")
-    Page<Film> findByMethod(String nome, Pageable pageable);
-
     @Aggregation(pipeline = { "{$group: { _id: '', filtroAnno: {$max:  $anno }}}" })
     public Integer max();
 

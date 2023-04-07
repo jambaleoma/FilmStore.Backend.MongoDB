@@ -16,6 +16,7 @@ public interface FilmService {
         Page<Film> getAllFilmsByName(String nome, FilmPage filmPage);
         Page<Film> getAllFilmsByFormat(String format, FilmPage filmPage);
         Page<Film> getAllFilmsByCategory(List<String> categories, FilmPage filmPage);
+        Page<Film> getAllFilmsByYear(Integer year, FilmPage filmPage);
         Page<Film> getAllFilteredFilms(FilterFilm filterFilm, FilmPage filmPage);
         Integer min();
         Integer max();
